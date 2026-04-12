@@ -8,20 +8,25 @@ import {
   Mic2
 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import { ActionLink, UnderConstructionButton } from "./ClientComponents";
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminDashboard() {
   const blogCount = await prisma.blog.count();
   const sermonViews = await prisma.sermon.aggregate({ _sum: { listeners: true } });
+  const blogViews = await prisma.blog.aggregate({ _sum: { views: true } });
+  const eventRegs = await prisma.event.aggregate({ _sum: { registrations: true } });
   const recentPosts = await prisma.blog.findMany({ orderBy: { createdAt: 'desc' }, take: 3 });
   const upcomingEvents = await prisma.event.findMany({ orderBy: { date: 'asc' }, take: 2 });
 
+  const totalInteractions = (sermonViews._sum.listeners ?? 0) + (blogViews._sum.views ?? 0) + (eventRegs._sum.registrations ?? 0);
+
   const stats = [
-    { label: "Visiteurs Totaux", value: "2,543", change: "+12.5%", icon: <Users className="text-blue-500" /> },
+    { label: "Interactions Totales", value: totalInteractions.toString(), change: "+n/a", icon: <Users className="text-blue-500" /> },
     { label: "Articles Publiés", value: blogCount.toString(), change: "+n/a", icon: <FileText className="text-purple-500" /> },
     { label: "Vues de Sermon", value: (sermonViews._sum.listeners ?? 0).toString(), change: "+n/a", icon: <Mic2 className="text-orange-500" /> },
-    { label: "Engagement", value: "84%", change: "+5.4%", icon: <TrendingUp className="text-green-500" /> },
+    { label: "Inscriptions Événements", value: (eventRegs._sum.registrations ?? 0).toString(), change: "+n/a", icon: <TrendingUp className="text-green-500" /> },
   ];
 
   return (
@@ -32,10 +37,10 @@ export default async function AdminDashboard() {
           <h1 className="text-3xl md:text-4xl font-black text-black">Tableau de Bord</h1>
           <p className="text-zinc-500 mt-2">Bienvenue sur l'interface de gestion ERANJES.</p>
         </div>
-        <button className="w-full md:w-auto bg-black text-white px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-primary hover:text-black transition-all group">
+        <ActionLink href="/admin/blogs" className="w-full md:w-auto bg-black text-white px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-primary hover:text-black transition-all group">
           <Plus size={20} />
           <span>Nouveau Contenu</span>
-        </button>
+        </ActionLink>
       </div>
 
       {/* Stats Grid */}
@@ -61,7 +66,7 @@ export default async function AdminDashboard() {
         <div className="lg:col-span-2 bg-white rounded-2xl border border-zinc-100 shadow-sm overflow-hidden">
           <div className="p-6 border-b border-zinc-50 flex justify-between items-center">
             <h3 className="text-lg font-bold">Articles Récents</h3>
-            <button className="text-zinc-400 font-bold text-xs uppercase tracking-widest hover:text-black">Voir tout</button>
+            <ActionLink href="/admin/blogs" className="text-zinc-400 font-bold text-xs uppercase tracking-widest hover:text-black">Voir tout</ActionLink>
           </div>
           <div className="divide-y divide-zinc-50">
             {recentPosts.map((post) => (
@@ -91,9 +96,9 @@ export default async function AdminDashboard() {
             <div className="relative z-10">
               <h3 className="text-2xl font-black text-black leading-tight">Prêt à diffuser un nouveau message ?</h3>
               <p className="text-black/60 text-sm mt-2 mb-6">Ajoutez un nouveau sermon ou un podcast en quelques clics.</p>
-              <button className="w-full bg-black text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 group-hover:scale-105 transition-transform">
+              <ActionLink href="/admin/sermons" className="w-full bg-black text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 group-hover:scale-105 transition-transform">
                 <Mic2 size={18} /> Uploader un Sermon
-              </button>
+              </ActionLink>
             </div>
             <div className="absolute -bottom-6 -right-6 text-black/5 rotate-12 group-hover:rotate-0 transition-transform duration-700">
                 <Mic2 size={160} />

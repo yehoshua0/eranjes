@@ -16,6 +16,7 @@ import {
   Menu,
   X
 } from "lucide-react";
+import { UnderConstructionButton } from "./ClientComponents";
 
 export default function AdminLayout({
   children,
@@ -88,10 +89,10 @@ export default function AdminLayout({
           </div>
 
           <div className="flex items-center gap-2 md:gap-6">
-            <button className="relative p-2 text-zinc-500 hover:bg-zinc-100 rounded-full transition-colors">
+            <UnderConstructionButton className="relative p-2 text-zinc-500 hover:bg-zinc-100 rounded-full transition-colors">
               <Bell size={20} />
               <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
-            </button>
+            </UnderConstructionButton>
             <div className="flex items-center gap-3 md:pl-6 md:border-l border-zinc-200">
               <div className="text-right hidden sm:block">
                 <p className="text-sm font-bold">Admin</p>

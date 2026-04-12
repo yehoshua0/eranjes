@@ -3,14 +3,14 @@ import {
   Calendar as CalendarIcon, 
   MapPin, 
   Clock, 
-  Plus, 
   Search, 
   MoreVertical, 
   Edit, 
-  Trash2,
   Users
 } from "lucide-react";
 import { getEvents } from "@/app/actions";
+import { CreateEventDialog, DeleteEventButton } from "./ClientComponents";
+import { UnderConstructionButton } from "../ClientComponents";
 
 export const dynamic = 'force-dynamic';
 
@@ -25,10 +25,7 @@ export default async function AdminEvenements() {
           <h1 className="text-4xl font-black text-black">Événements</h1>
           <p className="text-zinc-500 mt-2">Planifiez et gérez le calendrier de l'église.</p>
         </div>
-        <button className="bg-black text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-primary hover:text-black transition-all shadow-lg shadow-black/5">
-          <Plus size={20} />
-          <span>Nouvel Événement</span>
-        </button>
+        <CreateEventDialog />
       </div>
 
       <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm overflow-hidden">
@@ -82,9 +79,12 @@ export default async function AdminEvenements() {
                     </span>
                   </td>
                   <td className="px-6 py-6 text-right">
-                    <button className="p-2 text-zinc-400 hover:text-black hover:bg-zinc-100 rounded-lg transition-all">
-                      <MoreVertical size={18} />
-                    </button>
+                    <div className="flex items-center justify-end gap-2">
+                       <DeleteEventButton id={event.id} />
+                       <UnderConstructionButton className="p-2 text-zinc-400 hover:text-black hover:bg-zinc-100 rounded-lg transition-all">
+                         <MoreVertical size={18} />
+                       </UnderConstructionButton>
+                    </div>
                   </td>
                 </tr>
               ))}

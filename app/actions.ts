@@ -9,10 +9,42 @@ export async function getBlogs() {
   });
 }
 
-export async function createBlog(data: { title: string; category: string; author: string; content: string; excerpt?: string }) {
+export async function createBlog(formData: FormData) {
+  const title = formData.get("title") as string;
+  const category = formData.get("category") as string;
+  const author = formData.get("author") as string;
+  const content = formData.get("content") as string;
+  const excerpt = formData.get("excerpt") as string;
+  const coverFile = formData.get("cover") as File;
+
+  let cover = undefined;
+
+  if (coverFile && coverFile.size > 0) {
+    const { supabase } = await import('@/lib/supabase');
+    const fileExt = coverFile.name.split('.').pop();
+    const fileName = `${Date.now()}.${fileExt}`;
+    const filePath = `blogs/${fileName}`;
+
+    const { data: uploadData, error } = await supabase.storage
+      .from('medias')
+      .upload(filePath, coverFile);
+
+    if (error) {
+      console.error("Storage upload error:", error);
+    } else {
+      const { data: publicUrlData } = supabase.storage.from('medias').getPublicUrl(filePath);
+      cover = publicUrlData.publicUrl;
+    }
+  }
+
   const blog = await prisma.blog.create({
     data: {
-      ...data,
+      title,
+      category,
+      author,
+      content,
+      excerpt,
+      ...(cover && { cover }),
       views: 0,
       status: "Publié",
     },
@@ -34,10 +66,40 @@ export async function getSermons() {
   });
 }
 
-export async function createSermon(data: { title: string; preacher: string; duration: string; category: string }) {
+export async function createSermon(formData: FormData) {
+  const title = formData.get("title") as string;
+  const preacher = formData.get("preacher") as string;
+  const duration = formData.get("duration") as string;
+  const category = formData.get("category") as string;
+  const audioFile = formData.get("audio") as File;
+
+  let audioUrl = null;
+
+  if (audioFile && audioFile.size > 0) {
+    const { supabase } = await import('@/lib/supabase');
+    const fileExt = audioFile.name.split('.').pop();
+    const fileName = `${Date.now()}.${fileExt}`;
+    const filePath = `sermons/${fileName}`;
+
+    const { data: uploadData, error } = await supabase.storage
+      .from('medias')
+      .upload(filePath, audioFile);
+
+    if (error) {
+      console.error("Storage upload error:", error);
+    } else {
+      const { data: publicUrlData } = supabase.storage.from('medias').getPublicUrl(filePath);
+      audioUrl = publicUrlData.publicUrl;
+    }
+  }
+
   const sermon = await prisma.sermon.create({
     data: {
-      ...data,
+      title,
+      preacher,
+      duration,
+      category,
+      audioUrl,
       listeners: 0,
       status: "Publié",
     },

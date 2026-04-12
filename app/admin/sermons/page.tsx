@@ -1,17 +1,17 @@
 import React from "react";
 import { 
   Mic2, 
-  Plus, 
   Search, 
   Play, 
   Clock, 
   User, 
   MoreVertical, 
   Edit, 
-  Trash2,
   Calendar
 } from "lucide-react";
 import { getSermons } from "@/app/actions";
+import { CreateSermonDialog, DeleteSermonButton } from "./ClientComponents";
+import { UnderConstructionButton } from "../ClientComponents";
 
 export const dynamic = 'force-dynamic';
 
@@ -26,10 +26,7 @@ export default async function AdminSermons() {
           <h1 className="text-4xl font-black text-black">Gestion des Sermons</h1>
           <p className="text-zinc-500 mt-2">Gérez les enregistrements audio et podcasts de l'église.</p>
         </div>
-        <button className="bg-black text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-primary hover:text-black transition-all shadow-lg shadow-black/5">
-          <Plus size={20} />
-          <span>Uploader un Sermon</span>
-        </button>
+        <CreateSermonDialog />
       </div>
 
       {/* Grid of Sermons */}
@@ -44,9 +41,9 @@ export default async function AdminSermons() {
                 `}>
                   <Mic2 size={24} />
                 </div>
-                <button className="p-2 text-zinc-400 hover:text-black hover:bg-zinc-50 rounded-lg transition-all">
+                <UnderConstructionButton className="p-2 text-zinc-400 hover:text-black hover:bg-zinc-50 rounded-lg transition-all">
                   <MoreVertical size={18} />
-                </button>
+                </UnderConstructionButton>
               </div>
 
               <h3 className="text-lg font-bold group-hover:text-primary transition-colors mb-2 cursor-pointer">{sermon.title}</h3>
@@ -64,6 +61,11 @@ export default async function AdminSermons() {
                   <Clock size={14} className="text-zinc-400" />
                   <span>{sermon.duration}</span>
                 </div>
+                {sermon.audioUrl && (
+                  <div className="flex items-center gap-2 text-xs text-green-600 bg-green-50 px-2 py-1 rounded w-max font-bold mt-2">
+                    <Play size={10} fill="currentColor" /> Fichier Audio Disponible
+                  </div>
+                )}
               </div>
 
               <div className="mt-6 pt-6 border-t border-zinc-50 flex items-center justify-between">
@@ -78,12 +80,10 @@ export default async function AdminSermons() {
             </div>
             
             <div className="bg-zinc-50 px-6 py-4 flex gap-2">
-              <button className="flex-grow bg-white border border-zinc-200 py-2 rounded-lg text-xs font-bold hover:bg-black hover:text-white hover:border-black transition-all flex items-center justify-center gap-2">
+              <UnderConstructionButton className="flex-grow bg-white border border-zinc-200 py-2 rounded-lg text-xs font-bold hover:bg-black hover:text-white hover:border-black transition-all flex items-center justify-center gap-2">
                 <Edit size={14} /> Modifier
-              </button>
-              <button className="p-2 bg-white border border-zinc-200 rounded-lg text-red-500 hover:bg-red-50 hover:border-red-100 transition-all">
-                <Trash2 size={14} />
-              </button>
+              </UnderConstructionButton>
+              <DeleteSermonButton id={sermon.id} />
             </div>
           </div>
         ))}

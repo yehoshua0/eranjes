@@ -1,17 +1,17 @@
 import React from "react";
 import { 
   FileText, 
-  Plus, 
   Search, 
   Filter, 
   MoreVertical, 
   Edit, 
-  Trash2, 
   Eye,
   ChevronLeft,
   ChevronRight
 } from "lucide-react";
 import { getBlogs } from "@/app/actions";
+import { CreateBlogDialog, DeleteBlogButton } from "./ClientComponents";
+import { UnderConstructionButton } from "../ClientComponents";
 
 export const dynamic = 'force-dynamic';
 
@@ -26,10 +26,7 @@ export default async function AdminBlogs() {
           <h1 className="text-4xl font-black text-black">Gestion des Blogs</h1>
           <p className="text-zinc-500 mt-2">Créez, modifiez et organisez vos articles de blog.</p>
         </div>
-        <button className="bg-black text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-primary hover:text-black transition-all shadow-lg shadow-black/5">
-          <Plus size={20} />
-          <span>Créer un Article</span>
-        </button>
+        <CreateBlogDialog />
       </div>
 
       {/* Filters & Search */}
@@ -103,15 +100,13 @@ export default async function AdminBlogs() {
                   </td>
                   <td className="px-6 py-6">
                     <div className="flex items-center justify-end gap-2">
-                      <button className="p-2 text-zinc-400 hover:text-black hover:bg-zinc-200 rounded-lg transition-all">
+                      <UnderConstructionButton className="p-2 text-zinc-400 hover:text-black hover:bg-zinc-200 rounded-lg transition-all">
                         <Edit size={16} />
-                      </button>
-                      <button className="p-2 text-zinc-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all">
-                        <Trash2 size={16} />
-                      </button>
-                      <button className="p-2 text-zinc-400 hover:text-black hover:bg-zinc-200 rounded-lg transition-all">
+                      </UnderConstructionButton>
+                      <DeleteBlogButton id={blog.id} />
+                      <UnderConstructionButton className="p-2 text-zinc-400 hover:text-black hover:bg-zinc-200 rounded-lg transition-all">
                         <MoreVertical size={16} />
-                      </button>
+                      </UnderConstructionButton>
                     </div>
                   </td>
                 </tr>
