@@ -4,15 +4,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { PlayCircle, Calendar, User, Search } from "lucide-react";
 
-export default function SermonsPage() {
-    const sermons = [
-        { id: 1, title: "La Puissance de la Résurrection", date: "3 Mars 2024", speaker: "Pasteur Jean", category: "Foi" },
-        { id: 2, title: "Marcher dans l'Esprit", date: "25 Février 2024", speaker: "Pasteur Marc", category: "Vie Chrétienne" },
-        { id: 3, title: "L'Amour qui Transforme", date: "18 Février 2024", speaker: "Pasteur Jean", category: "Amour" },
-        { id: 4, title: "La Fidélité de Dieu", date: "11 Février 2024", speaker: "Pasteur Marc", category: "Grâce" },
-        { id: 5, title: "Prier sans cesse", date: "4 Février 2024", speaker: "Pasteur Jean", category: "Prière" },
-        { id: 6, title: "Bâtir sur le Roc", date: "28 Janvier 2024", speaker: "Pasteur Marc", category: "Fondation" },
-    ];
+import { getSermons } from "@/app/actions";
+
+export default async function SermonsPage() {
+    const sermons = await getSermons();
 
     return (
         <main className="min-h-screen bg-white">
@@ -65,13 +60,18 @@ export default function SermonsPage() {
                                     />
                                     <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-all"></div>
                                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <PlayCircle className="text-primary w-16 h-16" />
+                                        <PlayCircle className="text-primary w-16 h-16 shadow-2xl" />
                                     </div>
                                     <div className="absolute top-4 left-4">
                                         <span className="bg-primary text-black text-[10px] uppercase tracking-tighter font-bold px-3 py-1">
                                             {sermon.category}
                                         </span>
                                     </div>
+                                    {sermon.audioUrl && (
+                                        <div className="absolute bottom-4 right-4 bg-green-500 text-white text-[9px] font-black uppercase px-2 py-1 tracking-widest shadow-lg">
+                                            Audio disponible
+                                        </div>
+                                    )}
                                 </Link>
                                 <div className="text-center space-y-2">
                                     <Link href={`/sermons/${sermon.id}`}>
@@ -82,12 +82,12 @@ export default function SermonsPage() {
                                     <div className="flex items-center justify-center gap-4 text-xs text-zinc-500 uppercase tracking-widest font-bold">
                                         <div className="flex items-center gap-1">
                                             <Calendar size={14} className="text-primary" />
-                                            <span>{sermon.date}</span>
+                                            <span>{new Date(sermon.createdAt).toLocaleDateString('fr-FR')}</span>
                                         </div>
                                         <span>|</span>
                                         <div className="flex items-center gap-1">
                                             <User size={14} className="text-primary" />
-                                            <span>{sermon.speaker}</span>
+                                            <span>{sermon.preacher}</span>
                                         </div>
                                     </div>
                                 </div>

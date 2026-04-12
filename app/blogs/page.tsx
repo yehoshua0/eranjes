@@ -4,36 +4,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Clock, Tag } from "lucide-react";
 
-export default function BlogsPage() {
-    const posts = [
-        {
-            id: 1,
-            title: "Comment nourrir sa foi quotidiennement",
-            excerpt: "La vie moderne peut nous éloigner de l'essentiel. Voici 5 habitudes pour rester connecté à la Parole...",
-            date: "1 Mars 2024",
-            readTime: "5 min",
-            category: "Croissance",
-            author: "Pasteur Jean"
-        },
-        {
-            id: 2,
-            title: "L'impact du service dans la communauté",
-            excerpt: "Servir ne transforme pas seulement la vie des autres, mais surtout la nôtre. Découvrez le cœur d'ERANJES...",
-            date: "20 Février 2024",
-            readTime: "8 min",
-            category: "Communauté",
-            author: "Responsable Social"
-        },
-        {
-            id: 3,
-            title: "La jeunesse face aux défis du 21e siècle",
-            excerpt: "Être jeune et chrétien aujourd'hui demande du courage et du discernement. Un message pour notre génération...",
-            date: "10 Février 2024",
-            readTime: "12 min",
-            category: "Jeunesse",
-            author: "Leader Jeune"
-        }
-    ];
+import { getBlogs } from "@/app/actions";
+
+export default async function BlogsPage() {
+    const posts = await getBlogs();
 
     return (
         <main className="min-h-screen bg-white">
@@ -59,7 +33,7 @@ export default function BlogsPage() {
                             <article key={post.id} className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center group">
                                 <Link href={`/blogs/${post.id}`} className="relative aspect-[16/9] overflow-hidden border border-zinc-100 block">
                                     <Image
-                                        src="/explorer.jpg"
+                                        src={post.cover || "/explorer.jpg"}
                                         alt={post.title}
                                         fill
                                         className="object-cover transition-transform duration-1000 group-hover:scale-105"
@@ -78,7 +52,7 @@ export default function BlogsPage() {
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <Clock size={14} className="text-primary" />
-                                            <span>{post.readTime}</span>
+                                            <span>{new Date(post.createdAt).toLocaleDateString('fr-FR')}</span>
                                         </div>
                                     </div>
                                     <Link href={`/blogs/${post.id}`}>
@@ -86,7 +60,7 @@ export default function BlogsPage() {
                                             {post.title}
                                         </h2>
                                     </Link>
-                                    <p className="text-zinc-600 text-lg leading-relaxed max-w-xl">
+                                    <p className="text-zinc-600 text-lg leading-relaxed max-w-xl line-clamp-3">
                                         {post.excerpt}
                                     </p>
                                     <Link href={`/blogs/${post.id}`} className="inline-flex items-center gap-3 text-black font-bold uppercase tracking-widest text-sm group-hover:gap-5 transition-all">

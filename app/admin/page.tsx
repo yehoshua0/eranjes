@@ -1,32 +1,33 @@
 import React from "react";
-import { 
-  Users, 
-  TrendingUp, 
-  FileText, 
+import {
+  Users,
+  TrendingUp,
+  FileText,
   ArrowUpRight,
   Plus,
-  Mic2
+  Mic2,
+  Calendar
 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
-import { ActionLink, UnderConstructionButton } from "./ClientComponents";
+import { ActionLink } from "./ClientComponents";
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminDashboard() {
   const blogCount = await prisma.blog.count();
-  const sermonViews = await prisma.sermon.aggregate({ _sum: { listeners: true } });
+  const sermonCount = await prisma.sermon.count();
+  const eventCount = await prisma.event.count();
+  const sermonListeners = await prisma.sermon.aggregate({ _sum: { listeners: true } });
   const blogViews = await prisma.blog.aggregate({ _sum: { views: true } });
   const eventRegs = await prisma.event.aggregate({ _sum: { registrations: true } });
-  const recentPosts = await prisma.blog.findMany({ orderBy: { createdAt: 'desc' }, take: 3 });
-  const upcomingEvents = await prisma.event.findMany({ orderBy: { date: 'asc' }, take: 2 });
-
-  const totalInteractions = (sermonViews._sum.listeners ?? 0) + (blogViews._sum.views ?? 0) + (eventRegs._sum.registrations ?? 0);
+  const recentPosts = await prisma.blog.findMany({ orderBy: { createdAt: 'desc' }, take: 5 });
+  const upcomingEvents = await prisma.event.findMany({ orderBy: { date: 'asc' }, take: 3 });
 
   const stats = [
-    { label: "Interactions Totales", value: totalInteractions.toString(), change: "+n/a", icon: <Users className="text-blue-500" /> },
-    { label: "Articles Publiés", value: blogCount.toString(), change: "+n/a", icon: <FileText className="text-purple-500" /> },
-    { label: "Vues de Sermon", value: (sermonViews._sum.listeners ?? 0).toString(), change: "+n/a", icon: <Mic2 className="text-orange-500" /> },
-    { label: "Inscriptions Événements", value: (eventRegs._sum.registrations ?? 0).toString(), change: "+n/a", icon: <TrendingUp className="text-green-500" /> },
+    { label: "Articles Publiés", value: blogCount, icon: <FileText className="text-purple-500" /> },
+    { label: "Sermons", value: sermonCount, icon: <Mic2 className="text-orange-500" /> },
+    { label: "Événements", value: eventCount, icon: <Calendar className="text-blue-500" /> },
+    { label: "Total Vues Blog", value: blogViews._sum.views ?? 0, icon: <TrendingUp className="text-green-500" /> },
   ];
 
   return (
@@ -35,7 +36,7 @@ export default async function AdminDashboard() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
         <div>
           <h1 className="text-3xl md:text-4xl font-black text-black">Tableau de Bord</h1>
-          <p className="text-zinc-500 mt-2">Bienvenue sur l'interface de gestion ERANJES.</p>
+          <p className="text-zinc-500 mt-2">Bienvenue sur l&apos;interface de gestion ERANJES.</p>
         </div>
         <ActionLink href="/admin/blogs" className="w-full md:w-auto bg-black text-white px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-primary hover:text-black transition-all group">
           <Plus size={20} />
@@ -51,9 +52,6 @@ export default async function AdminDashboard() {
               <div className="p-3 bg-zinc-50 rounded-xl">
                 {stat.icon}
               </div>
-              <span className="text-green-500 text-xs font-bold flex items-center gap-1">
-                {stat.change} <ArrowUpRight size={14} />
-              </span>
             </div>
             <p className="text-zinc-500 text-sm font-medium">{stat.label}</p>
             <h3 className="text-2xl font-black mt-1">{stat.value}</h3>
@@ -69,6 +67,11 @@ export default async function AdminDashboard() {
             <ActionLink href="/admin/blogs" className="text-zinc-400 font-bold text-xs uppercase tracking-widest hover:text-black">Voir tout</ActionLink>
           </div>
           <div className="divide-y divide-zinc-50">
+            {recentPosts.length === 0 && (
+              <div className="p-8 text-center text-zinc-400 text-sm">
+                Aucun article. Créez votre premier article depuis la page Blogs.
+              </div>
+            )}
             {recentPosts.map((post) => (
               <div key={post.id} className="p-6 flex items-center justify-between group hover:bg-zinc-50 transition-colors">
                 <div className="flex items-center gap-4">
@@ -95,7 +98,7 @@ export default async function AdminDashboard() {
           <div className="bg-primary p-8 rounded-2xl shadow-xl shadow-primary/20 relative overflow-hidden group">
             <div className="relative z-10">
               <h3 className="text-2xl font-black text-black leading-tight">Prêt à diffuser un nouveau message ?</h3>
-              <p className="text-black/60 text-sm mt-2 mb-6">Ajoutez un nouveau sermon ou un podcast en quelques clics.</p>
+              <p className="text-black/60 text-sm mt-2 mb-6">Ajoutez un nouveau sermon en quelques clics.</p>
               <ActionLink href="/admin/sermons" className="w-full bg-black text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 group-hover:scale-105 transition-transform">
                 <Mic2 size={18} /> Uploader un Sermon
               </ActionLink>
@@ -106,8 +109,14 @@ export default async function AdminDashboard() {
           </div>
 
           <div className="bg-white p-6 rounded-2xl border border-zinc-100 shadow-sm">
-            <h3 className="text-lg font-bold mb-4">Prochains Événements</h3>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-bold">Prochains Événements</h3>
+              <ActionLink href="/admin/evenements" className="text-zinc-400 font-bold text-[10px] uppercase tracking-widest hover:text-black">Tout voir</ActionLink>
+            </div>
             <div className="space-y-4">
+              {upcomingEvents.length === 0 && (
+                <p className="text-sm text-zinc-400">Aucun événement planifié.</p>
+              )}
               {upcomingEvents.map((event) => (
                 <div key={event.id} className="flex gap-4 items-start">
                   <div className="flex-shrink-0 w-12 h-12 bg-zinc-50 rounded-lg border border-zinc-100 flex flex-col items-center justify-center">
@@ -127,4 +136,3 @@ export default async function AdminDashboard() {
     </div>
   );
 }
-

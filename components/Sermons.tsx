@@ -1,12 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 
-export default function Sermons() {
-    const sermons = [
-        { id: 1, title: "La Puissance de la Foi", date: "Janvier 5, 2024", speaker: "Pasteur Jean" },
-        { id: 2, title: "Vivre dans la Gloire", date: "Décembre 28, 2023", speaker: "Pasteur Jean" },
-        { id: 3, title: "L'Importance de la Saintété", date: "Décembre 21, 2023", speaker: "Pasteur Marc" },
-    ];
+import { getSermons } from "@/app/actions";
+
+export default async function Sermons() {
+    const allSermons = await getSermons();
+    const sermons = allSermons.slice(0, 3);
 
     return (
         <section id="sermons" className="py-24 bg-white text-black">
@@ -22,28 +21,28 @@ export default function Sermons() {
                             <div className="relative aspect-video overflow-hidden mb-6 border border-zinc-200 p-4 flex flex-col justify-end group">
                                 <Image
                                     src="/sermon.jpg"
-                                    alt="Sermon thumbnail"
+                                    alt={sermon.title}
                                     fill
                                     className="object-cover group-hover:scale-110 transition-transform duration-700"
                                 />
                                 <div className="absolute inset-0 bg-black/20"></div>
 
                                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                                    <span className="font-heading text-6xl text-white">Matters</span>
+                                    <span className="font-heading text-6xl text-white">{sermon.category.charAt(0)}</span>
                                 </div>
                                 <div className="border-4 border-primary/30 w-full h-full absolute inset-0 group-hover:border-primary transition-all duration-300"></div>
 
-                                <h4 className="relative z-10 font-heading text-2xl leading-none mb-1 group-hover:text-primary transition-colors text-white">
-                                    Holiness<br />Matters
+                                <h4 className="relative z-10 font-heading text-xl leading-none mb-1 group-hover:text-primary transition-colors text-white uppercase truncate">
+                                    {sermon.title}
                                 </h4>
-                                <span className="relative z-10 text-[10px] tracking-[0.2em] text-white/80">Message hebdomadaire</span>
+                                <span className="relative z-10 text-[10px] tracking-[0.2em] text-white/80 uppercase">{sermon.category}</span>
                             </div>
                             <div className="space-y-1">
                                 <h3 className="text-xl font-heading group-hover:text-primary transition-colors text-black">{sermon.title}</h3>
                                 <div className="flex items-center gap-4 text-xs text-zinc-500 tracking-wider">
-                                    <span className="font-bold">{sermon.speaker}</span>
+                                    <span className="font-bold">{sermon.preacher}</span>
                                     <span>•</span>
-                                    <span>{sermon.date}</span>
+                                    <span>{new Date(sermon.createdAt).toLocaleDateString('fr-FR')}</span>
                                 </div>
                             </div>
                         </Link>
